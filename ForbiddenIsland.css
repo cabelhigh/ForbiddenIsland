@@ -1,0 +1,19 @@
+td:not(.blank){
+  border: 2px black solid;
+}
+
+td {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+}
+
+#board {
+  position: relative;
+  left: 20%;
+}
+
+.flooding {
+
+  background-color: #c7c7ff;
+}
