@@ -1,14 +1,30 @@
 var tiles, board, treasureCards, floodCards, players;
 
+//MOVE PLAYER doesn't work
+
 function game() {
   tiles = makeTiles();
   treasureCards = makeCards();
   floodCards = makeFloodCards();
   board = makeBoard();
   players = makePlayers(2);
+  setStartingPlayers();
   var tDiscard = [], fDiscard=[], waterLevel = 0, floodDrawAmount;
   drawInitialFlood();
   checkWaterLevel();
+
+  function setStartingPlayers() {
+    players.forEach(function(p){
+      board.forEach(function(tile){
+            if(tile.index==p.location){
+              console.log("placing player ", p, tile);
+              tile.addPlayer(p);
+              //return false;
+            }
+      })
+    })
+
+  }
 
   function checkWaterLevel(){
     switch (true) {
@@ -71,6 +87,7 @@ function game() {
 
 }
 
+
 function makeBoard(){
   var b = [];
   for(var i = 0; i<36; i++){
@@ -93,7 +110,7 @@ function makePlayers(p){
   for(var i = 0; i < p; i++){
     a.push(makePlayer(roles.pop()));
   }
-  alert(p);
+  //alert(p);
   return a;
 }
 
@@ -137,8 +154,12 @@ function makePlayer(r){
     role: r,
     name: setName(r),
     start: setStart(r),
-    location: -1,
-    hand: [treasureCards.pop(), treasureCards.pop()]
+    location: setStart(r),
+    hand: [treasureCards.pop(), treasureCards.pop()],
+    updateLocation: function(l){
+      this.location = l;
+      return this.location;
+    }
   }
 }
 
@@ -206,13 +227,13 @@ function makeTile(index){
 
   function setType(i){
     if(i<10){
-      return 0; //normal tile
+      return "Normal"; //0, normal tile
     }
     else if(i<16){
-      return 1; //starting tile
+      return "Starting"; //1, starting tile
     }
     else {
-      return 2; //treasure tile
+      return "Treasure"; //2, treasure tile
     }
   }
 
@@ -230,14 +251,21 @@ function makeTile(index){
       return this.floodLevel--;
     },
     players: [],
-    removePlayer: function(p){
-      var index = -1;
-      players.forEach(function(e, i){
-        if(e.name==p.name){
-          index = i;
+    addPlayer: function (p){
+      this.players.push(p);
+      console.log("added player", p);
+      return this.players;
+    },
+    removePlayer: function(p){ //takes a player
+      console.log(this.players);
+      this.players.forEach(function(e, i){ //goes thru the players array
+        console.log("Player and index are");
+        if(e.name==p.name){ //if player in the array's name == player passed in's name
+          console.log("Player and index are", e, i);
+          this.players.splice(i,1); //remove the index where the two names matched
+          return false; //exit the loop
         }
-      })
-
+      });
     }
 
 
@@ -253,9 +281,12 @@ function getTileFromBoard(index){
 }
 
 function movePlayer(player, dest){
-  if(player.location != dest){
-    if(player.location != -1){
-    //  board[player.location]. //gets rid of specific player
+  if(player.location != dest){ //if the place you're starting does not equal your destination
+    if(player.location != -1 || player.location >=2 ){ //if the place you're going is not completely flooded or does not exist
+    console.log(board[player.location]);
+      player.updateLocation(dest);
+      board[player.location].removePlayer(player); //gets rid of specific player
+      board[dest].addPlayer(player); //does not work!!!
     }
   }
 }
