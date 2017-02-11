@@ -1,6 +1,7 @@
 var tiles, board, treasureCards, floodCards, players;
 
 //MOVE PLAYER doesn't work
+//Might have something to do with the controller?
 
 function game() {
   tiles = makeTiles();
@@ -237,12 +238,34 @@ function makeTile(index){
     }
   }
 
+  function setClass(i){
+
+    switch (i) {
+      case 16:
+      case 17:
+        return "earth";
+      case 18:
+      case 19:
+        return "wind";
+      case 20:
+      case 21:
+        return "fire";
+      case 22:
+      case 23:
+        return "ocean";
+      default:
+        return "";
+
+    }
+  }
+
 
 
   return {
     index: index,
     name: setName(index),
     type: setType(index),
+    tClass: setClass(index),
     floodLevel: 0, //0 is fine, 1 is swamped, 2 is flooded
     floodTile: function(){
       return this.floodLevel++;
@@ -250,46 +273,68 @@ function makeTile(index){
     drainTile: function() {
       return this.floodLevel--;
     },
-    players: [],
+    playersOnTile: [],
     addPlayer: function (p){
-      this.players.push(p);
-      console.log("added player", p);
-      return this.players;
+      this.playersOnTile.push(p);
+      console.log("added player", p, this.playersOnTile);
+      return this.playersOnTile;
     },
     removePlayer: function(p){ //takes a player
-      console.log(this.players);
-      this.players.forEach(function(e, i){ //goes thru the players array
-        console.log("Player and index are");
-        if(e.name==p.name){ //if player in the array's name == player passed in's name
-          console.log("Player and index are", e, i);
-          this.players.splice(i,1); //remove the index where the two names matched
-          return false; //exit the loop
+      var potLength = this.playersOnTile.length; //'this' JUST MEANS the current closure, not the object itsel
+      var potRet = this.playersOnTile;
+      console.log("WHY",potLength);
+      for(var inc = 0; inc < potLength; inc++){
+        if(potRet[inc].name==p.name){
+          if(potLength<=1){
+
+            console.log("setting players to empty");
+            potRet = [];
         }
-      });
+        else {
+            console.log("Splicing...", potRet.splice(inc+1,1)); //remove the index where the two names matched
+            console.log("Players now ", potRet );
+        }
+        break;
+      }
+    }
+    this.playersOnTile=potRet;
+
     }
 
 
   }
 }
 
-function getTileFromBoard(index){
-  board.forEach(function(e, i){
-    if(e.index==index){
-      return i;
-    }
-  })
-}
 
-function movePlayer(player, dest){
+function movePlayer(player, dest){ //dest is data-index/array index value but needs to be converted to tile index
   if(player.location != dest){ //if the place you're starting does not equal your destination
     if(player.location != -1 || player.location >=2 ){ //if the place you're going is not completely flooded or does not exist
-    console.log(board[player.location]);
-      player.updateLocation(dest);
-      board[player.location].removePlayer(player); //gets rid of specific player
+      var oldLoc = player.location; //there's a mismatch between the tile id and the board index
+      console.log("HERE",board[getTileFromBoard(oldLoc)]);
+      board[getTileFromBoard(oldLoc)].removePlayer(player); //gets rid of specific player
+      player.updateLocation(board[dest].index); //gotta clean the index termonology up
       board[dest].addPlayer(player); //does not work!!!
+      console.log(board[getTileFromBoard(oldLoc)], board[dest]);
     }
   }
 }
+
+function getTileFromBoard(index){ //index refers to tile index, returns array index
+  var ind = -1;
+  board.forEach(function(e, i){ //forEach's cannot be returned or broken out of
+    if(e.index==index){
+    //  console.log("e.index and index", e.index, index, i);
+      ind = i;
+    }
+  });
+
+  return ind;
+}
+
+function getTileFromIndex(index){ //index refers to array index
+  return board[index];
+}
+
 
 function shuffle(array) {
   var m = array.length, t, i;

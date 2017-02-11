@@ -13,8 +13,26 @@ td {
   left: 20%;
 }
 
-.flooding {
+.earth {
+  color: #279c04;
+  border: 2px #279c04 solid !important;
+}
 
+.wind {
+  color: #b99608;
+  border: 2px #b99608 solid !important;
+}
+
+.fire {
+  color: red;
+  border: 2px red solid !important;
+}
+.ocean {
+  color: blue;
+  border: 2px blue solid !important;
+}
+
+.flooding {
   background-color: #c7c7ff;
 }
 
