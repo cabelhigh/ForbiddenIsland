@@ -17,7 +17,7 @@ function game() {
   function setStartingPlayers() {
     players.forEach(function(p){
       board.forEach(function(tile){
-            if(tile.index==p.location){
+            if(tile.id==p.location){
               console.log("placing player ", p, tile);
               tile.addPlayer(p);
               //return false;
@@ -154,8 +154,8 @@ function makePlayer(r){
   return {
     role: r,
     name: setName(r),
-    start: setStart(r),
-    location: setStart(r),
+    start: setStart(r), //refers to the tile id
+    location: setStart(r), //refers to the tile id
     hand: [treasureCards.pop(), treasureCards.pop()],
     updateLocation: function(l){
       this.location = l;
@@ -202,7 +202,7 @@ function makeCard(type){
 
 function makeFloodCards() {
   var f = [];
-  for(var i = 2; i < 34; i++){
+  for(var i = 2; i < 34; i++){ //refers to board indexes
     if(i == 4 || i == 5 ||
        i == 6 || i == 11 || i == 24 || i == 29 ||
        i == 30 || i == 31){}
@@ -221,7 +221,7 @@ function makeTiles() {
   return shuffle(t);
 }
 
-function makeTile(index){
+function makeTile(id){
   function setName(i){
     return ""+i;
   }
@@ -262,10 +262,10 @@ function makeTile(index){
 
 
   return {
-    index: index,
-    name: setName(index),
-    type: setType(index),
-    tClass: setClass(index),
+    id: id,
+    name: setName(id),
+    type: setType(id),
+    tClass: setClass(id),
     floodLevel: 0, //0 is fine, 1 is swamped, 2 is flooded
     floodTile: function(){
       return this.floodLevel++;
@@ -312,18 +312,17 @@ function movePlayer(player, dest){ //dest is data-index/array index value but ne
       var oldLoc = player.location; //there's a mismatch between the tile id and the board index
       console.log("HERE",board[getTileFromBoard(oldLoc)]);
       board[getTileFromBoard(oldLoc)].removePlayer(player); //gets rid of specific player
-      player.updateLocation(board[dest].index); //gotta clean the index termonology up
+      player.updateLocation(board[dest].id); //gotta clean the index termonology up
       board[dest].addPlayer(player); //does not work!!!
       console.log(board[getTileFromBoard(oldLoc)], board[dest]);
     }
   }
 }
 
-function getTileFromBoard(index){ //index refers to tile index, returns array index
+function getTileFromBoard(id){ //id refers to tile id, returns array index
   var ind = -1;
   board.forEach(function(e, i){ //forEach's cannot be returned or broken out of
-    if(e.index==index){
-    //  console.log("e.index and index", e.index, index, i);
+    if(e.id==id){
       ind = i;
     }
   });

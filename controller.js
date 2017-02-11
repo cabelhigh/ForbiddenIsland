@@ -68,7 +68,7 @@ $(document).ready(function() {
 function adjCheck(playerLoc, clickLoc) { //checks if click was on valid adjacent tile
   //console.log(playerLoc, clickLoc);
   if((board[clickLoc+1]==board[playerLoc]||board[clickLoc-1]==board[playerLoc]
-    || board[clickLoc+6]==board[playerLoc] || board[clickLoc-6]==board[playerLoc])&&board[clickLoc]!=-1){
+    || board[clickLoc+6]==board[playerLoc] || board[clickLoc-6]==board[playerLoc])&&board[clickLoc]!=-1&&board[clickLoc]!=board[playerLoc]){
       return true;
     }
     else {
