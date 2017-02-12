@@ -1,19 +1,17 @@
 var tiles, board, treasureCards, floodCards, players;
 
-//MOVE PLAYER doesn't work
-//Might have something to do with the controller?
-
 function game() {
   tiles = makeTiles();
   treasureCards = makeCards();
   floodCards = makeFloodCards();
   board = makeBoard();
-  players = makePlayers(2);
+  players = makePlayers(3);
   setStartingPlayers();
   var tDiscard = [], fDiscard=[], waterLevel = 0, floodDrawAmount;
   drawInitialFlood();
   checkWaterLevel();
 
+  //Places the players on their 'starting' tiles
   function setStartingPlayers() {
     players.forEach(function(p){
       board.forEach(function(tile){
@@ -27,6 +25,7 @@ function game() {
 
   }
 
+  //Increments the floodDrawAmount if the waterLevel has increased
   function checkWaterLevel(){
     switch (true) {
       case waterLevel<3:
@@ -44,25 +43,26 @@ function game() {
     }
   }
 
+  //Draws the initial flood cards, floods the tiles, and places them in the discard pile
   function drawInitialFlood(){
     for(var i = 0; i<6; i++){
-      // board[floodCards.pop()].floodTile();
       fDiscard.push(floodTile(floodCards.pop()))
     }
   }
 
+  //'Floods' tiles by either incrementing their floodLevel if it's <2 or by replacing the tile with a -1 if it's > 2
   function floodTile(index){
-    if(board[index]==-1){
+    if(board[index]==-1){ //If the indicated index is already -1, i.e flooded
       alert("That tile is already completely flooded!")
     }
     else{
-      board[index].floodTile()
-      if(board[index].floodLevel>2){
+      board[index].floodTile()  //Calls floodTile() on the Tile, which I just realized is confusing
+      if(board[index].floodLevel>2){ //If, after flooding the tile, the floodLevel is > 2
         console.log("Oh no! That tile has completely flooded!")
-        board[index]=-1;
+        board[index]=-1; //Replace the tile with a -1
       }
       else{
-        console.log(board[index].name + " has been flooded!")
+        console.log(board[index].name + " has been flooded!") //Note that the tile has been partially flooded
       }
     }
     return index;
@@ -88,35 +88,37 @@ function game() {
 
 }
 
-
+//Returns a 'b' array with -1s (empty tiles) and shuffled tiles from the 'tiles' array
 function makeBoard(){
   var b = [];
   for(var i = 0; i<36; i++){
     if(i == 0 || i == 1 || i == 4 || i == 5 ||
        i == 6 || i == 11 || i == 24 || i == 29 ||
        i == 30 || i == 31 || i == 34 || i == 35) {
-         b.push(-1);
+         b.push(-1); //Puts -1s only on the edges of the board, as per the FI rules
        }
        else{
-         b.push(tiles.shift());
+         b.push(tiles.shift()); //puts the top tile in the 'tiles' array into the 'b' array
        }
   }
   return b;
 
 }
 
+//Makes a specified number of players for the game
 function makePlayers(p){
-  var a = [];
-  var roles = shuffle([1,2,3,4,5,6]);
-  for(var i = 0; i < p; i++){
-    a.push(makePlayer(roles.pop()));
+  var a = []; //Array of players, to be returned into the 'players' array
+  var roles = shuffle([1,2,3,4,5,6]); //the six different roles, randomly assigned to the different players
+  for(var i = 0; i < p; i++){ //for each player in the num of players specified
+    a.push(makePlayer(roles.pop())); //make a player with the last num in the shuffled 'roles' array and push it to the 'a' array
   }
-  //alert(p);
   return a;
 }
 
+//'player' constructor, takes in a role
 function makePlayer(r){
 
+  //Sets a name based on the numberic role, as per the FI rules
   function setName(role){
     switch(role){
       case 1:
@@ -130,10 +132,11 @@ function makePlayer(r){
       case 5:
         return "Diver";
       case 6:
-        return "Navigator";
+        return "Navigatress";
     }
   }
 
+  //Sets a starting location (is tile id, not array index)
   function setStart(role){
     switch(role){
       case 1:
@@ -164,6 +167,7 @@ function makePlayer(r){
   }
 }
 
+//Returns a shuffled deck of treasure cards, as per the FI rules
 function makeCards() {
   var c = [];
   for(var i = 0; i<28; i++){
@@ -173,18 +177,20 @@ function makeCards() {
 
 }
 
+//'card' constructor, takes in the type of card
 function makeCard(type){
 
+  //returns the name of the card and some HTML if the card is to be styled
   function setTitle(t){
     switch (true) {
       case t < 5:
-          return "The Crystal of Fire";
+          return '<span class="fCard">The Crystal of Fire</span>';
       case t < 10:
-          return "The Ocean's Chalice";
+          return '<span class="oCard">The Ocean\'s Chalice</span>';
       case t < 15:
-          return "The Statue of the Wind";
+          return '<span class="wCard">The Statue of the Wind</span>';
       case t < 20:
-          return "The Earth Stone";
+          return '<span class="eCard">The Earth Stone</span>';
       case t < 23:
           return "Water Rises!";
       case t < 26:
@@ -200,6 +206,7 @@ function makeCard(type){
   }
 }
 
+//Returns a shuffled array of numbers that correspond to indexes in our 'board' array
 function makeFloodCards() {
   var f = [];
   for(var i = 2; i < 34; i++){ //refers to board indexes
@@ -213,6 +220,7 @@ function makeFloodCards() {
   return shuffle(f);
 }
 
+//Returns a shuffled list of board tiles
 function makeTiles() {
   var t = [];
   for(var i = 0; i<24; i++){
@@ -221,11 +229,15 @@ function makeTiles() {
   return shuffle(t);
 }
 
+//'tile' constructor, takes in an id which determines both its identifier and the type of tile it is
 function makeTile(id){
+
+  //The 'name' is just a stringified 'id', unsure why it exists
   function setName(i){
     return ""+i;
   }
 
+  //Sets the different types based on the 'id'
   function setType(i){
     if(i<10){
       return "Normal"; //0, normal tile
@@ -238,6 +250,7 @@ function makeTile(id){
     }
   }
 
+  //Sets the different CSS classes based on the 'id'
   function setClass(i){
 
     switch (i) {
@@ -283,15 +296,15 @@ function makeTile(id){
       var potLength = this.playersOnTile.length; //'this' JUST MEANS the current closure, not the object itsel
       var potRet = this.playersOnTile;
       console.log("WHY",potLength);
-      for(var inc = 0; inc < potLength; inc++){
-        if(potRet[inc].name==p.name){
-          if(potLength<=1){
+      for(var inc = 0; inc < potLength; inc++){ //for the num of players on the tile
+        if(potRet[inc].name==p.name){ //if the current element's name is the name of the player passed in
+          if(potLength<=1){ //if the tile only has one player on it
 
             console.log("setting players to empty");
-            potRet = [];
+            potRet = []; //just reset the array
         }
-        else {
-            console.log("Splicing...", potRet.splice(inc+1,1)); //remove the index where the two names matched
+        else { //if not, splice the player out
+            console.log("Splicing...", potRet.splice(inc,1)); //remove the index where the two names matched
             console.log("Players now ", potRet );
         }
         break;
@@ -305,21 +318,22 @@ function makeTile(id){
   }
 }
 
-
+//Takes a player, removes them from their location, and adds them to a new one
 function movePlayer(player, dest){ //dest is data-index/array index value but needs to be converted to tile index
   if(player.location != dest){ //if the place you're starting does not equal your destination
     if(player.location != -1 || player.location >=2 ){ //if the place you're going is not completely flooded or does not exist
-      var oldLoc = player.location; //there's a mismatch between the tile id and the board index
+      var oldLoc = player.location;
       console.log("HERE",board[getTileFromBoard(oldLoc)]);
       board[getTileFromBoard(oldLoc)].removePlayer(player); //gets rid of specific player
-      player.updateLocation(board[dest].id); //gotta clean the index termonology up
-      board[dest].addPlayer(player); //does not work!!!
+      player.updateLocation(board[dest].id);
+      board[dest].addPlayer(player);
       console.log(board[getTileFromBoard(oldLoc)], board[dest]);
     }
   }
 }
 
-function getTileFromBoard(id){ //id refers to tile id, returns array index
+//Takes in a tile id, returns the corresponding array index
+function getTileFromBoard(id){
   var ind = -1;
   board.forEach(function(e, i){ //forEach's cannot be returned or broken out of
     if(e.id==id){
@@ -330,11 +344,12 @@ function getTileFromBoard(id){ //id refers to tile id, returns array index
   return ind;
 }
 
+//Takes in an array index, gets back the corresponding tile
 function getTileFromIndex(index){ //index refers to array index
   return board[index];
 }
 
-
+//A simple shuffle function
 function shuffle(array) {
   var m = array.length, t, i;
 

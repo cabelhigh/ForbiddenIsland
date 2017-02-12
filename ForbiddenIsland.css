@@ -8,10 +8,22 @@ td {
   text-align: center;
 }
 
+/*Main Page Layout stuff*/
+
 #board {
-  position: relative;
-  left: 20%;
+  /*margin: auto;*/
 }
+
+.center {
+  /*text-align: center;*/
+}
+
+.col-sm-3 div {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+/*Different tiles*/
 
 .earth {
   color: #279c04;
@@ -41,32 +53,61 @@ td {
   height: 20%;
 }
 
-.mes, .exp, .eng, .pil, .div, .nav {
+/*UI CSS*/
+
+.current {
+  text-decoration: underline;
+}
+
+.nameColor {
+  display: inline-flex;
+}
+
+.eCard{
+  color: #279c04;
+}
+
+.wCard {
+  color: #b99608;
+}
+
+.fCard {
+  color: red;
+}
+
+.oCard {
+  color: blue;
+}
+
+/*Classes of the player icons on the board*/
+/*All references of 'nav' changed to 'navi' to avoid confusion w/ Bootstrap 'nav'*/
+.mess, .expl, .engi, .pilo, .dive, .navi {
   width: 20px;
   height: 20px;
   border-radius: 100%;
 }
 
-.mes {
-  background-color: green;
-}
 
-.exp {
+.mess {
   background-color: black;
 }
 
-.eng {
-  background-color: orange;
+.expl {
+  background-color: green;
 }
 
-.pil {
-  background-color: blue;
-}
-
-.div {
+.engi {
   background-color: red;
 }
 
-.nav {
-  background-color: purple;
+.pilo {
+  background-color: blue;
+}
+
+.dive {
+  background-color: grey;
+}
+
+.navi {
+  background-color: yellow;
 }
