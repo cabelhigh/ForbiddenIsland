@@ -45,7 +45,14 @@ td {
 }
 
 .flooding {
+  animation: floodingTile 1.5s 2;
   background-color: #c7c7ff;
+}
+
+@keyframes floodingTile {
+  0% {background-color: #c7c7ff;}
+  50% {background-color: white}
+  100% {background-color: #c7c7ff}
 }
 
 .players {
@@ -85,6 +92,7 @@ td {
   width: 20px;
   height: 20px;
   border-radius: 100%;
+  display: inline-flex;
 }
 
 

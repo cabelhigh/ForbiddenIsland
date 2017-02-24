@@ -1,4 +1,5 @@
 var tiles, board, treasureCards, floodCards, players;
+var tDiscard = [], fDiscard=[], waterLevel = 0, floodDrawAmount;
 
 function game() {
   tiles = makeTiles();
@@ -6,8 +7,8 @@ function game() {
   floodCards = makeFloodCards();
   board = makeBoard();
   players = makePlayers(3);
+  addWaterRisesCards();
   setStartingPlayers();
-  var tDiscard = [], fDiscard=[], waterLevel = 0, floodDrawAmount;
   drawInitialFlood();
   checkWaterLevel();
 
@@ -58,25 +59,45 @@ function game() {
     else{
       board[index].floodTile()  //Calls floodTile() on the Tile, which I just realized is confusing
       if(board[index].floodLevel>2){ //If, after flooding the tile, the floodLevel is > 2
-        console.log("Oh no! That tile has completely flooded!")
+      //  alert(board[index].name +" That tile has completely flooded!")
         board[index]=-1; //Replace the tile with a -1
       }
       else{
-        console.log(board[index].name + " has been flooded!") //Note that the tile has been partially flooded
+  //      alert(board[index].name + " has been flooded!") //Note that the tile has been partially// flooded
       }
     }
     return index;
+  }
+
+  function addWaterRisesCards(){
+    for(var i = 25; i<28; i++){ //Don't put Water rises until AFTER the players have been dealt their initial hand
+        treasureCards.push(makeCard(i));
+    }
+    treasureCards=shuffle(treasureCards)
   }
 
   return {
     getBoard: board,
     getCards: treasureCards,
     getFloodCards: floodCards,
-    incWaterLevel: function() {
-      return this.waterLevel++;
+    drawFlood: function() {
+      for(var i = 0; i<floodDrawAmount; i++){
+        fDiscard.push(floodTile(floodCards.pop()))
+      }
     },
-    checkWaterLevel: function() {
+    shuffleInFlood: function(){
+      shuffle(fDiscard).forEach(function(e){
+        floodCards.push(e);
+      })
+      fDiscard = [];
+    },
+    incWaterLevel: function() {
+      waterLevel++;
       checkWaterLevel();
+      return waterLevel;
+    },
+    getFloodDrawAmount: function() {
+      return floodDrawAmount;
     },
 
     floodTile: function(i) {
@@ -160,6 +181,25 @@ function makePlayer(r){
     start: setStart(r), //refers to the tile id
     location: setStart(r), //refers to the tile id
     hand: [treasureCards.pop(), treasureCards.pop()],
+    drawCards: function(){
+      var draw1 = treasureCards.pop(), draw2 = treasureCards.pop();
+      if(draw1.title=="Water Rises!"&&draw2.title=="Water Rises!") {
+        return -2;
+      }
+      else if(draw1.title=="Water Rises!"){
+        this.hand.push(draw2);
+        return -1;
+      }
+      else if(draw2.title=="Water Rises!"){
+        this.hand.push(draw1);
+        return -1;
+      }
+      else{
+        this.hand.push(draw1, draw2);
+        return this.hand;
+
+      }
+    },
     updateLocation: function(l){
       this.location = l;
       return this.location;
@@ -170,7 +210,7 @@ function makePlayer(r){
 //Returns a shuffled deck of treasure cards, as per the FI rules
 function makeCards() {
   var c = [];
-  for(var i = 0; i<28; i++){
+  for(var i = 0; i<25; i++){ //Don't put Water rises until AFTER the players have been dealt their initial hand
       c.push(makeCard(i));
   }
   return shuffle(c);
@@ -191,12 +231,13 @@ function makeCard(type){
           return '<span class="wCard">The Statue of the Wind</span>';
       case t < 20:
           return '<span class="eCard">The Earth Stone</span>';
-      case t < 23:
-          return "Water Rises!";
-      case t < 26:
+      case t < 22:
+          return "Sandbags";
+      case t < 25:
           return "Helicopter Lift";
       case t < 28:
-          return "Sandbags";
+          return "Water Rises!"
+
     }
   }
 
